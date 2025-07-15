@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore di CV e Lettere Motivazionali</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF CDN for client-side PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Custom styles for Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        /* Style for scrollable sections */
+        .scrollable-content {
+            max-height: 400px; /* Adjust as needed */
+            overflow-y: auto;
+            border: 1px solid #e5e7eb; /* Light border */
+            border-radius: 0.5rem; /* Rounded corners */
+            padding: 1rem;
+            background-color: #ffffff;
+        }
+        /* Hide scrollbar for a cleaner look, but keep functionality */
+        .scrollable-content::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollable-content {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Generatore di CV e Lettere Motivazionali</h1>
+
+        <!-- Input Section -->
+        <div class="space-y-6 mb-8">
+            <!-- Personal Information -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                    <input type="text" id="name" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. Mario Rossi">
+                </div>
+                <div>
+                    <label for="desiredPosition" class="block text-sm font-medium text-gray-700">Posizione Desiderata</label>
+                    <input type="text" id="desiredPosition" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. Sviluppatore Software">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. mario.rossi@email.com">
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Telefono</label>
+                    <input type="tel" id="phone" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. +39 333 1234567">
+                </div>
+                <div>
+                    <label for="linkedin" class="block text-sm font-medium text-gray-700">LinkedIn URL (Opzionale)</label>
+                    <input type="url" id="linkedin" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. linkedin.com/in/mariorossi">
+                </div>
+                <div>
+                    <label for="portfolio" class="block text-sm font-medium text-gray-700">Portfolio/Website URL (Opzionale)</label>
+                    <input type="url" id="portfolio" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. ilmioportfolio.com">
+                </div>
+            </div>
+
+            <!-- Work Experience Section -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Esperienze Lavorative</label>
+                <div id="workExperiences" class="space-y-4 border border-gray-200 p-4 rounded-md bg-gray-50">
+                    <!-- Dynamic work experience fields will be added here -->
+                </div>
+                <button type="button" onclick="addWorkExperienceField()" class="mt-3 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Aggiungi Esperienza</button>
+            </div>
+
+            <!-- Education Section -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Formazione</label>
+                <div id="education" class="space-y-4 border border-gray-200 p-4 rounded-md bg-gray-50">
+                    <!-- Dynamic education fields will be added here -->
+                </div>
+                <button type="button" onclick="addEducationField()" class="mt-3 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Aggiungi Formazione</button>
+            </div>
+
+            <!-- Skills Section -->
+            <div>
+                <label for="skills" class="block text-sm font-medium text-gray-700">Competenze (separate da virgola)</label>
+                <input type="text" id="skills" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. JavaScript, Python, Gestione Progetti">
+            </div>
+
+            <!-- Languages Section -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Lingue</label>
+                <div id="languages" class="space-y-4 border border-gray-200 p-4 rounded-md bg-gray-50">
+                    <!-- Dynamic language fields will be added here -->
+                </div>
+                <button type="button" onclick="addLanguageField()" class="mt-3 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Aggiungi Lingua</button>
+            </div>
+
+            <!-- Optional: Cover Letter Specifics -->
+            <div>
+                <label for="companyName" class="block text-sm font-medium text-gray-700">Nome Azienda (per Lettera Motivazionale)</label>
+                <input type="text" id="companyName" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. Azienda S.p.A.">
+            </div>
+            <div>
+                <label for="hiringManager" class="block text-sm font-medium text-gray-700">Responsabile Assunzioni (Opzionale, per Lettera Motivazionale)</label>
+                <input type="text" id="hiringManager" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. Sig.ra Bianchi">
+            </div>
+            <div>
+                <label for="jobAdSource" class="block text-sm font-medium text-gray-700">Dove hai visto l'annuncio (Opzionale, per Lettera Motivazionale)</label>
+                <input type="text" id="jobAdSource" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Es. LinkedIn, Sito web aziendale">
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            <button onclick="generateCV()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                Genera CV
+            </button>
+            <button onclick="generateCoverLetter()" class="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                Genera Lettera Motivazionale
+            </button>
+            <button onclick="downloadPdf('cv')" id="downloadCvPdfBtn" class="px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150 hidden">
+                Scarica CV (PDF)
+            </button>
+            <button onclick="downloadPdf('letter')" id="downloadLetterPdfBtn" class="px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150 hidden">
+                Scarica Lettera (PDF)
+            </button>
+        </div>
+
+        <!-- Output Section -->
+        <div class="relative">
+            <div id="loadingIndicator" class="hidden absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-xl z-10">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                <p class="ml-4 text-gray-700">Generazione in corso...</p>
+            </div>
+            <label for="output" class="block text-sm font-medium text-gray-700 mb-2">Testo Generato</label>
+            <textarea id="output" rows="15" class="w-full p-4 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"></textarea>
+            <button onclick="copyToClipboard()" class="mt-4 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">Copia negli Appunti</button>
+        </div>
+
+        <!-- Message Box for alerts -->
+        <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl border border-gray-200 z-50">
+            <p id="messageText" class="text-lg text-gray-800 mb-4"></p>
+            <button onclick="hideMessageBox()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+
+        // --- Utility Functions ---
+        function showMessageBox(message) {
+            document.getElementById('messageText').innerText = message;
+            document.getElementById('messageBox').classList.remove('hidden');
+        }
+
+        function hideMessageBox() {
+            document.getElementById('messageBox').classList.add('hidden');
+        }
+
+        function removeField(buttonElement) {
+            buttonElement.closest('.dynamic-field-group').remove();
+            saveData(); // Save data after removing a field
+        }
+
+        // --- Dynamic Field Management ---
+        function addWorkExperienceField() {
+            const container = document.getElementById('workExperiences');
+            const newField = document.createElement('div');
+            newField.className = 'dynamic-field-group border border-gray-200 p-3 rounded-md mb-3 bg-white';
+            newField.innerHTML = `
+                <div class="flex flex-wrap -mx-2 mb-2">
+                    <input type="text" placeholder="Ruolo (Es. Sviluppatore)" class="work-role mt-1 block w-full sm:w-1/3 px-2 py-3 border border-gray-300 rounded-md shadow-sm flex-grow mx-2 mb-2 sm:mb-0" oninput="saveData()">
+                    <input type="text" placeholder="Azienda (Es. Tech Solutions)" class="work-company mt-1 block w-full sm:w-1/3 px-2 py-3 border border-gray-300 rounded-md shadow-sm flex-grow mx-2 mb-2 sm:mb-0" oninput="saveData()">
+                    <input type="text" placeholder="Periodo (Es. 2020-2023)" class="work-period mt-1 block w-full sm:w-1/4 px-2 py-3 border border-gray-300 rounded-md shadow-sm flex-grow mx-2 mb-2 sm:mb-0" oninput="saveData()">
+                </div>
+                <textarea placeholder="Responsabilità e Risultati chiave (usa punti elenco)" class="work-responsibilities mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm" rows="3" oninput="saveData()"></textarea>
+                <button type="button" onclick="removeField(this)" class="mt-3 px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-sm">Rimuovi</button>
+            `;
+            container.appendChild(newField);
+            saveData(); // Save data after adding a field
+        }
+
+        function addEducationField() {
+            const container = document.getElementById('education');
+            const newField = document.createElement('div');
+            newField.className = 'dynamic-field-group border border-gray-200 p-3 rounded-md mb-3 bg-white';
+            newField.innerHTML = `
+                <div class="flex flex-wrap -mx-2 mb-2">
+                    <input type="text" placeholder="Titolo (Es. Laurea in Informatica)" class="edu-degree mt-1 block w-full sm:w-1/2 px-2 py-3 border border-gray-300 rounded-md shadow-sm flex-grow mx-2 mb-2 sm:mb-0" oninput="saveData()">
+                    <input type="text" placeholder="Istituzione (Es. Università di Milano)" class="edu-institution mt-1 block w-full sm:w-1/3 px-2 py-3 border border-gray-300 rounded-md shadow-sm flex-grow mx-2 mb-2 sm:mb-0" oninput="saveData()">
+                    <input type="text" placeholder="Periodo (Es. 2017-2020)" class="edu-period mt-1 block w-full sm:w-1/4 px-2 py-3 border border-gray-300 rounded-md shadow-sm flex-grow mx-2 mb-2 sm:mb-0" oninput="saveData()">
+                </div>
+                <textarea placeholder="Note o Voto Finale" class="edu-notes mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm" rows="2" oninput="saveData()"></textarea>
+                <button type="button" onclick="removeField(this)" class="mt-3 px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-sm">Rimuovi</button>
+            `;
+            container.appendChild(newField);
+            saveData(); // Save data after adding a field
+        }
+
+        function addLanguageField() {
+            const container = document.getElementById('languages');
+            const newField = document.createElement('div');
+            newField.className = 'dynamic-field-group flex items-center space-x-2 mb-2';
+            newField.innerHTML = `
+                <input type="text" placeholder="Lingua (Es. Inglese)" class="lang-name mt-1 block w-1/2 p-3 border border-gray-300 rounded-md shadow-sm" oninput="saveData()">
+                <select class="lang-level mt-1 block w-1/2 p-3 border border-gray-300 rounded-md shadow-sm" onchange="saveData()">
+                    <option value="">Seleziona Livello</option>
+                    <option value="Base">Base</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Avanzato">Avanzato</option>
+                    <option value="Madrelingua">Madrelingua</option>
+                </select>
+                <button type="button" onclick="removeField(this)" class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex-shrink-0 text-sm">Rimuovi</button>
+            `;
+            container.appendChild(newField);
+            saveData(); // Save data after adding a field
+        }
+
+        // --- Data Persistence (localStorage) ---
+        function saveData() {
+            const data = collectData();
+            localStorage.setItem('cvAppFormData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('cvAppFormData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+
+                document.getElementById('name').value = data.name || '';
+                document.getElementById('desiredPosition').value = data.desiredPosition || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('linkedin').value = data.linkedin || '';
+                document.getElementById('portfolio').value = data.portfolio || '';
+                document.getElementById('skills').value = (data.skills || []).join(', ');
+                document.getElementById('companyName').value = data.companyName || '';
+                document.getElementById('hiringManager').value = data.hiringManager || '';
+                document.getElementById('jobAdSource').value = data.jobAdSource || '';
+
+                // Clear existing dynamic fields before loading
+                document.getElementById('workExperiences').innerHTML = '';
+                document.getElementById('education').innerHTML = '';
+                document.getElementById('languages').innerHTML = '';
+
+                // Load work experiences
+                if (data.workExperiences && data.workExperiences.length > 0) {
+                    data.workExperiences.forEach(exp => {
+                        addWorkExperienceField(); // Add a new field structure
+                        const lastField = document.querySelector('#workExperiences .dynamic-field-group:last-child');
+                        lastField.querySelector('.work-role').value = exp.role || '';
+                        lastField.querySelector('.work-company').value = exp.company || '';
+                        lastField.querySelector('.work-period').value = exp.period || '';
+                        lastField.querySelector('.work-responsibilities').value = exp.responsibilities || '';
+                    });
+                } else {
+                    addWorkExperienceField(); // Add one empty field if none saved
+                }
+
+                // Load education
+                if (data.education && data.education.length > 0) {
+                    data.education.forEach(edu => {
+                        addEducationField(); // Add a new field structure
+                        const lastField = document.querySelector('#education .dynamic-field-group:last-child');
+                        lastField.querySelector('.edu-degree').value = edu.degree || '';
+                        lastField.querySelector('.edu-institution').value = edu.institution || '';
+                        lastField.querySelector('.edu-period').value = edu.period || '';
+                        lastField.querySelector('.edu-notes').value = edu.notes || '';
+                    });
+                } else {
+                    addEducationField(); // Add one empty field if none saved
+                }
+
+                // Load languages
+                if (data.languages && data.languages.length > 0) {
+                    data.languages.forEach(lang => {
+                        addLanguageField(); // Add a new field structure
+                        const lastField = document.querySelector('#languages .dynamic-field-group:last-child');
+                        lastField.querySelector('.lang-name').value = lang.name || '';
+                        lastField.querySelector('.lang-level').value = lang.level || '';
+                    });
+                } else {
+                    addLanguageField(); // Add one empty field if none saved
+                }
+            } else {
+                // If no saved data, add initial empty fields
+                addWorkExperienceField();
+                addEducationField();
+                addLanguageField();
+            }
+        }
+
+        // --- Data Collection ---
+        function collectData() {
+            const name = document.getElementById('name').value.trim();
+            const desiredPosition = document.getElementById('desiredPosition').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const linkedin = document.getElementById('linkedin').value.trim();
+            const portfolio = document.getElementById('portfolio').value.trim();
+            const skills = document.getElementById('skills').value.trim().split(',').map(s => s.trim()).filter(s => s !== '');
+            const companyName = document.getElementById('companyName').value.trim();
+            const hiringManager = document.getElementById('hiringManager').value.trim();
+            const jobAdSource = document.getElementById('jobAdSource').value.trim();
+
+            const workExperiences = [];
+            document.querySelectorAll('#workExperiences .dynamic-field-group').forEach(div => {
+                const role = div.querySelector('.work-role').value.trim();
+                const company = div.querySelector('.work-company').value.trim();
+                const period = div.querySelector('.work-period').value.trim();
+                const responsibilities = div.querySelector('.work-responsibilities').value.trim();
+                if (role || company || period || responsibilities) { // Only add if at least one field is filled
+                    workExperiences.push({ role, company, period, responsibilities });
+                }
+            });
+
+            const education = [];
+            document.querySelectorAll('#education .dynamic-field-group').forEach(div => {
+                const degree = div.querySelector('.edu-degree').value.trim();
+                const institution = div.querySelector('.edu-institution').value.trim();
+                const period = div.querySelector('.edu-period').value.trim();
+                const notes = div.querySelector('.edu-notes').value.trim();
+                if (degree || institution || period || notes) { // Only add if at least one field is filled
+                    education.push({ degree, institution, period, notes });
+                }
+            });
+
+            const languages = [];
+            document.querySelectorAll('#languages .dynamic-field-group').forEach(div => {
+                const name = div.querySelector('.lang-name').value.trim();
+                const level = div.querySelector('.lang-level').value.trim();
+                if (name && level) {
+                    languages.push({ name, level });
+                }
+            });
+
+            return { name, desiredPosition, email, phone, linkedin, portfolio, workExperiences, education, skills, languages, companyName, hiringManager, jobAdSource };
+        }
+
+        // --- Text Generation Logic (Simulated AI) ---
+        function generateCV() {
+            const data = collectData();
+            const outputElement = document.getElementById('output');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const downloadCvPdfBtn = document.getElementById('downloadCvPdfBtn');
+            const downloadLetterPdfBtn = document.getElementById('downloadLetterPdfBtn');
+
+            // Basic validation
+            if (!data.name || !data.desiredPosition) {
+                showMessageBox("Per favore, inserisci il tuo Nome Completo e la Posizione Desiderata per generare il CV.");
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            outputElement.value = ''; // Clear previous output
+            downloadCvPdfBtn.classList.add('hidden'); // Hide PDF button until generated
+            downloadLetterPdfBtn.classList.add('hidden');
+
+            setTimeout(() => { // Simulate AI generation delay
+                let cvText = `Curriculum Vitae\n\n`;
+
+                // Personal Information
+                cvText += `Dati Personali\n`;
+                cvText += `Nome: ${data.name}\n`;
+                cvText += `Posizione Desiderata: ${data.desiredPosition}\n`;
+                if (data.email) cvText += `Email: ${data.email}\n`;
+                if (data.phone) cvText += `Telefono: ${data.phone}\n`;
+                if (data.linkedin) cvText += `LinkedIn: ${data.linkedin}\n`;
+                if (data.portfolio) cvText += `Portfolio: ${data.portfolio}\n`;
+                cvText += `\n`;
+
+                // Summary (more varied phrases)
+                const summaryPhrases = [
+                    `Professionista con esperienza alla ricerca di una posizione come ${data.desiredPosition}.`,
+                    `Candidato/a dinamico/a e orientato/a ai risultati, con un forte interesse per il ruolo di ${data.desiredPosition}.`,
+                    `Esperto/a nel campo di ${data.desiredPosition}, con comprovata capacità di raggiungere obiettivi ambiziosi.`,
+                    `Motivato/a e proattivo/a, con una solida base di conoscenze e competenze per la posizione di ${data.desiredPosition}.`
+                ];
+                let selectedSummary = summaryPhrases[Math.floor(Math.random() * summaryPhrases.length)];
+
+                if (data.skills.length > 0) {
+                    selectedSummary += ` Possiedo solide competenze in ${data.skills.join(', ')}.`;
+                }
+                cvText += `Riepilogo\n`;
+                cvText += `${selectedSummary}\n\n`;
+
+                // Work Experience
+                if (data.workExperiences.length > 0) {
+                    cvText += `Esperienze Lavorative\n`;
+                    data.workExperiences.forEach(exp => {
+                        if (exp.role && exp.company && exp.period) {
+                            cvText += `- ${exp.role} presso ${exp.company} (${exp.period})\n`;
+                            if (exp.responsibilities) {
+                                exp.responsibilities.split('\n').forEach(line => {
+                                    const trimmedLine = line.trim();
+                                    if (trimmedLine) {
+                                        cvText += `  • ${trimmedLine}\n`;
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    cvText += `\n`;
+                }
+
+                // Education
+                if (data.education.length > 0) {
+                    cvText += `Formazione\n`;
+                    data.education.forEach(edu => {
+                        if (edu.degree && edu.institution && edu.period) {
+                            cvText += `- ${edu.degree} presso ${edu.institution} (${edu.period})\n`;
+                            if (edu.notes) {
+                                cvText += `  Note: ${edu.notes}\n`;
+                            }
+                        }
+                    });
+                    cvText += `\n`;
+                }
+
+                // Skills
+                if (data.skills.length > 0) {
+                    cvText += `Competenze\n`;
+                    cvText += `- ${data.skills.join(', ')}\n\n`;
+                }
+
+                // Languages
+                if (data.languages.length > 0) {
+                    cvText += `Lingue\n`;
+                    data.languages.forEach(lang => {
+                        if (lang.name && lang.level) {
+                            cvText += `- ${lang.name}: ${lang.level}\n`;
+                        }
+                    });
+                    cvText += `\n`;
+                }
+
+                outputElement.value = cvText;
+                loadingIndicator.classList.add('hidden');
+                downloadCvPdfBtn.classList.remove('hidden'); // Show PDF button
+            }, 1000); // 1 second delay
+        }
+
+        function generateCoverLetter() {
+            const data = collectData();
+            const outputElement = document.getElementById('output');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const downloadCvPdfBtn = document.getElementById('downloadCvPdfBtn');
+            const downloadLetterPdfBtn = document.getElementById('downloadLetterPdfBtn');
+
+            // Basic validation
+            if (!data.name || !data.desiredPosition || !data.companyName) {
+                showMessageBox("Per favore, inserisci il tuo Nome Completo, la Posizione Desiderata e il Nome Azienda per generare la Lettera Motivazionale.");
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            outputElement.value = ''; // Clear previous output
+            downloadCvPdfBtn.classList.add('hidden'); // Hide PDF button until generated
+            downloadLetterPdfBtn.classList.add('hidden');
+
+            setTimeout(() => { // Simulate AI generation delay
+                const date = new Date().toLocaleDateString('it-IT');
+                let coverLetterText = ``;
+
+                // Salutation
+                coverLetterText += `[La Tua Città], ${date}\n\n`;
+                if (data.companyName) {
+                    coverLetterText += `${data.companyName}\n`;
+                }
+                if (data.hiringManager) {
+                    coverLetterText += `All'attenzione di ${data.hiringManager}\n`;
+                }
+                coverLetterText += `\n`;
+                coverLetterText += `Oggetto: Candidatura per la posizione di ${data.desiredPosition}\n\n`;
+
+                // Opening Paragraph (more varied)
+                const openingPhrases = [
+                    `Scrivo in riferimento alla Sua ricerca per la posizione di ${data.desiredPosition}`,
+                    `Con grande interesse, Le presento la mia candidatura per la posizione di ${data.desiredPosition}`,
+                    `Sono venuto/a a conoscenza della Sua ricerca per un/a ${data.desiredPosition} e desidero esprimere il mio vivo interesse`
+                ];
+                let selectedOpening = openingPhrases[Math.floor(Math.random() * openingPhrases.length)];
+                if (data.jobAdSource) {
+                    selectedOpening += ` che ho trovato su ${data.jobAdSource}`;
+                }
+                selectedOpening += `. Sono rimasto/a particolarmente colpito/a dall'opportunità di contribuire al successo di ${data.companyName}.\n\n`;
+                coverLetterText += `Spett.le ${data.hiringManager ? data.hiringManager : 'Responsabile delle Assunzioni'},\n\n`;
+                coverLetterText += selectedOpening;
+
+                // Body Paragraphs (linking experience and skills)
+                if (data.workExperiences.length > 0 && data.skills.length > 0) {
+                    const firstExp = data.workExperiences[0];
+                    const relevantSkills = data.skills.slice(0, Math.min(2, data.skills.length));
+                    coverLetterText += `Nel corso della mia esperienza come ${firstExp.role} presso ${firstExp.company}, ho sviluppato competenze chiave in aree come ${relevantSkills.join(' e ')}. Sono fiducioso/a che le mie qualifiche e la mia dedizione possano apportare un valore significativo al vostro team.\n\n`;
+                } else if (data.skills.length > 0) {
+                    coverLetterText += `Le mie competenze, che includono ${data.skills.join(', ')}, mi permettono di affrontare con efficacia le sfide legate a questa posizione. Sono una persona proattiva e orientata ai risultati, desiderosa di mettere le proprie capacità al servizio di un'azienda dinamica come la vostra.\n\n`;
+                } else {
+                    coverLetterText += `Sono una persona motivata e con una forte etica del lavoro, pronta a mettere a disposizione le mie capacità per raggiungere gli obiettivi aziendali. Credo fermamente che il mio profilo sia in linea con le vostre aspettative.\n\n`;
+                }
+
+                // Closing (more varied)
+                const closingPhrases = [
+                    `Allego il mio Curriculum Vitae per una più dettagliata valutazione delle mie qualifiche e resto a completa disposizione per un colloquio conoscitivo, durante il quale potremo approfondire come le mie competenze possano soddisfare le vostre esigenze.`,
+                    `La ringrazio per il tempo e l'attenzione dedicatami. Sarei lieto/a di poter discutere di persona come le mie qualifiche possano contribuire al successo della vostra azienda.`,
+                    `Sono entusiasta all'idea di unire il vostro team e sono disponibile per un colloquio in qualsiasi momento. Allego il mio CV per la vostra revisione.`
+                ];
+                coverLetterText += closingPhrases[Math.floor(Math.random() * closingPhrases.length)] + `\n\n`;
+                coverLetterText += `Ringraziando per la cortese attenzione, porgo i miei più cordiali saluti.\n\n`;
+                coverLetterText += `${data.name}\n`;
+
+                outputElement.value = coverLetterText;
+                loadingIndicator.classList.add('hidden');
+                downloadLetterPdfBtn.classList.remove('hidden'); // Show PDF button
+            }, 1000); // 1 second delay
+        }
+
+        // --- PDF Download Function ---
+        function downloadPdf(type) {
+            const outputText = document.getElementById('output').value;
+            if (!outputText) {
+                showMessageBox("Genera prima un CV o una Lettera Motivazionale.");
+                return;
+            }
+
+            const doc = new jsPDF();
+            const lines = doc.splitTextToSize(outputText, 180); // Adjust width for text wrapping
+
+            let y = 10; // Starting Y position
+            const lineHeight = 7; // Line height
+            const pageHeight = doc.internal.pageSize.height;
+
+            lines.forEach(line => {
+                if (y + lineHeight > pageHeight - 10) { // Check if new page is needed
+                    doc.addPage();
+                    y = 10; // Reset Y for new page
+                }
+                doc.text(line, 10, y);
+                y += lineHeight;
+            });
+
+            const filename = type === 'cv' ? 'Curriculum_Vitae.pdf' : 'Lettera_Motivazionale.pdf';
+            doc.save(filename);
+            showMessageBox(`Il tuo ${type === 'cv' ? 'CV' : 'Lettera'} è stato scaricato come PDF!`);
+        }
+
+        // --- Clipboard Function ---
+        function copyToClipboard() {
+            const output = document.getElementById('output');
+            output.select();
+            output.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                document.execCommand('copy');
+                showMessageBox("Testo copiato negli appunti!");
+            } catch (err) {
+                showMessageBox("Impossibile copiare il testo. Si prega di copiare manualmente.");
+            }
+        }
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData(); // Load saved data on page load
+            // Add event listeners for input changes to save data
+            document.querySelectorAll('input, textarea, select').forEach(element => {
+                // Only add if not already handled by dynamic field functions
+                if (!element.closest('.dynamic-field-group')) {
+                    element.addEventListener('input', saveData);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
